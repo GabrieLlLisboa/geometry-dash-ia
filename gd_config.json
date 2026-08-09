@@ -1,0 +1,23 @@
+{
+  "game_region": [
+    63,
+    77,
+    1842,
+    996
+  ],
+  "percent_region": [
+    1066,
+    483,
+    1367,
+    959
+  ],
+  "jump_key": "space",
+  "step_delay": 0.033,
+  "frame_size": [
+    84,
+    84
+  ],
+  "frame_stack": 4,
+  "checkpoint_path": "C:\\Users\\gabri\\OneDrive\\Documentos\\github\\geometry-dash-ia\\checkpoints\\gd_agent.pt",
+  "log_path": "C:\\Users\\gabri\\OneDrive\\Documentos\\github\\geometry-dash-ia\\logs\\train_log.csv"
+}

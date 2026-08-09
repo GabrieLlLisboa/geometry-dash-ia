@@ -1,0 +1,7 @@
+numpy
+opencv-python
+mss
+torch
+pydirectinput; platform_system == "Windows"
+pyautogui
+pytesseract

@@ -6,7 +6,24 @@ decorando uma fase, só que treinando centenas de tentativas por hora.
 
 ## O que ela FAZ
 
-- Aprende a fase que estiver aberta na tela, por tentativa e erro.
+- Aprende a fase que estiver aberta na tela, por tentativa e erro, usando
+  uma rede neural **Dueling Double DQN** (versão bem mais estável e
+  eficiente que um DQN básico — separa "o quão bom é esse momento" de
+  "o quanto vale a pena pular aqui", e evita ela ficar otimista demais
+  com ações ruins).
+- Abre uma **janela de visualização ao vivo** ("GD-AI - o que ela esta
+  pensando") mostrando:
+  - o frame que ela está enxergando, com um **mapa de calor** por cima
+    (vermelho/amarelo = pixels que mais pesaram na decisão dela naquele
+    instante — isso é literalmente pra onde a "atenção" da rede foi);
+  - barra de confiança de cada ação (pular vs não pular), com a
+    escolhida destacada em verde;
+  - tentativa atual, melhor % alcançada, epsilon (o quanto ela ainda
+    está "no chute") e recompensa acumulada;
+  - gráfico de linha com o histórico de recompensa das últimas
+    tentativas, pra você ver a tendência de melhora.
+  - Dentro da janela: aperte **V** pra esconder só a visualização (o
+    treino continua rodando mais rápido sem ela), ou **Q** pra parar tudo.
 - Salva o "cérebro" dela em disco (`checkpoints/gd_agent.pt`), então
   quanto mais tempo você deixar rodando (e mesmo fechando e abrindo de
   novo), melhor ela fica **naquela fase**.
@@ -91,7 +108,18 @@ Em `config.py` dá pra mexer em:
 - `step_delay`: quão rápido ela reage (menor = mais preciso, mais pesado).
 - `frame_stack`: quantos frames ela vê de uma vez (mais = melhor noção de
   velocidade, mas mais lento pra treinar).
+- `epsilon_decay_steps`: quantos passos de treino até ela parar de "chutar"
+  e passar a confiar mais no que aprendeu. Baixe esse número se quiser
+  ver mudança de comportamento mais rápido em sessões curtas.
+- `target_tau`: estabilidade do aprendizado (menor = mais suave/estável,
+  porém mais devagar pra "puxar" o alvo pro que ela aprendeu de novo).
+- `show_visualizer`: `true`/`false` pra abrir ou não a janela de "o que
+  ela está pensando" (desligar deixa o treino mais rápido).
+- `saliency_every_n_steps`: de quantos em quantos passos ela recalcula o
+  mapa de calor (esse cálculo é mais pesado que uma decisão normal —
+  aumente esse número se a IA estiver reagindo devagar demais por causa
+  da visualização).
 
-Em `agent.py`, a classe `DQNAgent` tem `epsilon_decay_steps` (quanto tempo
-ela leva pra parar de "chutar" e passar a confiar no que aprendeu) e `gamma`
-(quanto ela valoriza recompensas futuras vs imediatas).
+Em `agent.py`, a classe `DQNAgent` tem `gamma` (quanto ela valoriza
+recompensas futuras vs imediatas) e a arquitetura `DuelingQNetwork`
+(tamanho das camadas, caso queira uma rede maior/menor).

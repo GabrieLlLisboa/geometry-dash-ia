@@ -35,6 +35,24 @@ DEFAULT_CONFIG = {
 
     # Onde salvar logs de treino (pra ver evolução)
     "log_path": os.path.join(os.path.dirname(__file__), "logs", "train_log.csv"),
+
+    # Quantos PASSOS DE TREINO até o epsilon (chance de ação aleatória)
+    # cair do máximo até o mínimo. Com fases curtas/mortes rápidas no
+    # início, 100_000 demora demais pra ver ela "confiando" no que
+    # aprendeu — valores entre 5_000 e 20_000 costumam mostrar progresso
+    # visível bem mais rápido em sessões curtas de treino.
+    "epsilon_decay_steps": 8000,
+    "epsilon_end": 0.05,
+
+    # Quão suave é a atualização da rede-alvo (soft update). Menor = mais
+    # suave/estável, porém mais lento pra "puxar" o alvo pro que ela
+    # acabou de aprender.
+    "target_tau": 0.01,
+
+    # ----- Visualizacao ao vivo -----
+    "show_visualizer": True,
+    "visualizer_scale": 6,          # quanto a imagem 84x84 é ampliada na janela
+    "saliency_every_n_steps": 3,    # calcula o mapa de "pensamento" a cada N passos (mais caro)
 }
 
 

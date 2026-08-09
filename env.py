@@ -49,6 +49,12 @@ class GDEnv:
         self._episode_steps = 0
         self.max_episode_steps = 6000  # ~200s por tentativa, teto de segurança
 
+        # anti-ruído do OCR: só considera "morreu" se a queda de % se
+        # repetir em leituras consecutivas, evitando falso-positivo por
+        # erro de leitura isolado (que causava reinício/morte fantasma)
+        self._drop_confirm_count = 0
+        self._drop_confirm_needed = 2
+
     # ---------- API estilo Gym ----------
 
     def reset(self):
@@ -61,6 +67,7 @@ class GDEnv:
         self._prev_percent = 0
         self._steps_since_progress = 0
         self._episode_steps = 0
+        self._drop_confirm_count = 0
 
         frame = self.capturer.grab_processed(self.frame_size)
         self.frames.clear()
@@ -105,9 +112,18 @@ class GDEnv:
             if percent >= 100:
                 return 20.0, True, info
 
-            # morreu: porcentagem caiu bastante em relação ao pico atingido
+            # morreu: porcentagem caiu bastante em relação ao pico atingido.
+            # Exige a queda em leituras CONSECUTIVAS antes de confirmar,
+            # pra não reiniciar por causa de um erro isolado de OCR
+            # (o que causava um espaço "fantasma" matando ela de verdade).
             if percent < self._best_percent_this_try - 5 and self._best_percent_this_try > 2:
-                return -1.0, True, info
+                self._drop_confirm_count += 1
+                if self._drop_confirm_count >= self._drop_confirm_needed:
+                    return -1.0, True, info
+                # ainda não confirmado: não pune, não reinicia, só ignora
+                return 0.0, False, info
+            else:
+                self._drop_confirm_count = 0
 
             # progresso: recompensa proporcional ao quanto avançou
             progress = max(0, percent - self._best_percent_this_try)

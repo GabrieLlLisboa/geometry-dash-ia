@@ -107,9 +107,19 @@ class DQNAgent:
         self.last_q_values = np.zeros(n_actions, dtype=np.float32)
 
         if checkpoint_path and os.path.exists(checkpoint_path):
-            self.load(checkpoint_path)
-            print(f"[agent] checkpoint carregado de {checkpoint_path} "
-                  f"(steps_done={self.steps_done})")
+            try:
+                self.load(checkpoint_path)
+                print(f"[agent] checkpoint carregado de {checkpoint_path} "
+                      f"(steps_done={self.steps_done})")
+            except RuntimeError as e:
+                print("=" * 60)
+                print("[aviso] o checkpoint salvo não é compatível com a")
+                print("arquitetura atual da rede (provavelmente foi salvo")
+                print("com uma versão diferente do código). Começando um")
+                print("cérebro NOVO do zero. O arquivo antigo não foi")
+                print("apagado, só ignorado — se quiser, delete-o manualmente:")
+                print(f"  {checkpoint_path}")
+                print("=" * 60)
 
     def epsilon(self):
         frac = min(1.0, self.steps_done / self.epsilon_decay_steps)
